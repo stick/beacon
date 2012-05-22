@@ -1,0 +1,74 @@
+How It Works
+------------
+
+Pretty simple.  each contact has multiple addresses defined using the format;
+contact_protocol:address:number_of_notifications
+When the notification count is equal to or greater than the
+number_of_notifications, that protocol is triggered with the resulting address.
+This allows for personalized escalation.
+
+Templates
+---------
+
+Each contact protocol should accept 5 bits of data:
+subject: subject of the alert
+message: content / body of the alert -- put all your gory details here
+title: specifically for prowl/nma -- maps to the application field
+priority: defaults to 'normal' (again more specific to prowl/nma), but can be
+overridden [optional]
+url: prowl only -- urls can be embedded in the message but prowl suppots opening
+a defined url in another application [optional]
+
+Temlates are read from the template_dir (passed as the sole argument to the
+script if required) in the following order.
+
+{protocol}.{notification_type}.template.sh
+{protocol}.template.sh
+template.sh
+
+At a minimum the last should exist and be sane for all notifications.
+
+This allows you to define the content of the notification based on the protocol
+as well as the notification type (ack, recovery, etc).
+
+All nagios macros are valid within the templates.
+
+Templates are sourced from the script, so they must be valid shellcode.  This
+means you can do tricky logic in templates as well.
+
+This also means be careful what you put in here, the shellcode is sourced blind.
+
+Example Nagios Configuration
+----------------------------
+
+define contact {
+  contact_name 'Junior Admin'
+  email jadmin@example.com
+  pager 4545551212
+  service_notification_commands beacon, notify-by-email, notify-by-pager
+  address1 prowl:{apikey}:3  # after the 3rd notification -- send via prowl to the designated api key
+  address2 nma:{apikey}:4    # after the 4th notification -- send via nma to designated api key
+}
+
+Defined Protocols
+-------------------
+
+It's trivial to add another contact protocol, in most cases you need a small
+helper script that knows how to handle the 5 portions of the template.  However
+being shell code it's trival to use echo ... | ... as well.
+
+Just add another option to the case statement defining another contact protocol.
+[2]
+
+prowl: http://www.prowlapp.com
+nma: https://nma.usk.bz/index.jsp
+email: /usr/bin/mail
+sms: stubbed but not implemented [1]
+
+
+1. SMS is generally easier to send using an email gateway by the provider in
+question.  However a small wrapper around qpage/sendpage would work here as
+well.
+
+2. Use wrappers and pass arguments.  Pipes and escapes can get a little messy
+with several levels of shell indirection.
