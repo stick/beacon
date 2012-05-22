@@ -80,6 +80,7 @@ function determine_contact() {
     proto=$( echo $contactaddr | awk -F: '{ print $1 }' )
     apikey=$( echo $contactaddr | awk -F: '{ print $2 }' )
     notify_num=$( echo $contactaddr | awk -F: '{ print $3 }' )
+    priority_override=$( echo $contactaddr | awk -F: '{ print $4 }' )
     notify_num=${notify_num:=0}
 
     if [ -n "$DEBUG" ]; then
@@ -142,6 +143,9 @@ function send() {
     load_template $proto
     [ -n "$DEBUG" ] && echo "Finished search - $proto/$addr"
   fi
+
+  # use overload priority from contact address if present
+  [ -n "$priority_override" ] && priority=$priority_override
 
   ## add contact protocols here ##
   case $proto in

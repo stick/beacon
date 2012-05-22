@@ -1,3 +1,4 @@
+# figure out the comment mess
 if [ -n "$NAGIOS_NOTIFICATIONAUTHOR" -a -n "$NAGIOS_NOTIFICATIONCOMMENT" ]; then
   comment=$NAGIOS_NOTIFICATIONCOMMENT
   author=${NAGIOS_NOTIFICATIONAUTHORALIAS:-$NAGIOS_NOTIFICATIONAUTHOR}
@@ -9,11 +10,17 @@ elif [ -n "$NAGIOS_HOSTACKAUTHOR" -a -n "$NAGIOS_HOSTACKCOMMENT" ]; then
   author=${NAGIOS_HOSTACKAUTHORALIAS:-$NAGIOS_HOSTACKAUTHOR}
 fi
 
+# comment or not comment
 if [ -n "$comment" -a -n "$author" ]; then
   message="$comment by $author"
 else
   message="$NAGIOS_SERVICEOUTPUT @ $NAGIOS_SHORTDATETIME"
 fi
-
 title="$NAGIOS_NOTIFICATIONTYPE"
-subject="$NAGIOS_SERVICESTATE $NAGIOS_SERVICEDESC/$NAGIOS_HOSTNAME"
+
+# subject
+if [ "$ALERT_TYPE" == "service" ]; then
+  subject="$NAGIOS_SERVICESTATE $NAGIOS_SERVICEDESC/$NAGIOS_HOSTNAME"
+else
+  subject="$NAGIOS_HOSTSTATE $NAGIOS_HOSTNAME"
+fi
