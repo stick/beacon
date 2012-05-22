@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-# $Id$
+# Provided AS-IS
+# SEE LICENSE for more details
+# 
 
 [[ "$1" == '-h' ]] && echo "$0 [path to template dir (/etc/nagios/contact_protocols)]" && exit 1
 # debug mode
