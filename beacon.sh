@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 # debug mode set prior to execution -- this shortcircutes execution and displays lots of info
-DEBUG=${DEBUG:-'1'}
+DEBUG=${DEBUG:+'1'}
 
 # contact protocol application paths
 PROWL="/usr/local/sbin/prowl.pl"
