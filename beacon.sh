@@ -23,12 +23,12 @@
 # SOFTWARE.
 
 # debug mode set prior to execution -- this shortcircutes execution and displays lots of info
-DEBUG=${DEBUG:+"echo"}
+DEBUG=${DEBUG:-'1'}
 
 # contact protocol application paths
-PROWL="$DEBUG prowl.pl"
-NMA="$DEBUG nma.pl"
-MAILBIN="$DEBUG /usr/bin/mail"
+PROWL="/usr/local/sbin/prowl.pl"
+NMA="nma.pl"
+MAILBIN="/usr/bin/mail"
 TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
 
 # temlate searches
@@ -43,13 +43,10 @@ INNER_SEARCH=( \$NAGIOS_NOTIFICATIONTYPE \$NAGIOS_CONTACTNAME )
 ### -- TAKE CAUTION CHANGING ANYTHING BELOW THIS LINE -- ###
 [[ "$1" == '-h' ]] && echo "$0 [path to template dir (/etc/nagios/contact_protocols)]" && exit 1
 
-# testing
-if [ -e /tmp/service-notification -o -n "$DEBUG" ]; then
-  for x in $(< /tmp/service-notification); do
-    eval export $x &> /dev/null
-  done
+if [ -n "$DEBUG" ]; then
+  echo "Alert time: $NAGIOS_LONGDATETIME"
+  env |grep NAGIOS_ > /tmp/macros
 fi
-
 
 function determine_contact() {
   # nagios supports 6 contactaddresses
@@ -74,6 +71,17 @@ function determine_contact() {
   done
 }
 
+function attempt_load() {
+  local t_attempt=$1
+  [[ -n "$DEBUG" ]] && echo "searching for $t_attempt"
+  if [ -e "$t_attempt" ]; then
+    [[ -n "$DEBUG" ]] && echo "Loading $t_attempt"
+    . "$t_attempt" && return 0
+  else
+    return 1
+  fi
+}
+
 function load_template() {
   local protocol=$1
   local template
@@ -84,23 +92,18 @@ function load_template() {
     scratch=( ${INNER_SEARCH[*]} )
     for i in ${scratch[@]}; do
       local last_index=$(( ${#scratch[*]} - 1 ))
+      OLDIFS=$IFS
       IFS="."
       eval full_t="${scratch[*]}"
+      IFS=$OLDIFS
       template="${TEMPLATE_DIR}/${s1}.${full_t}.template.rc"
       unset scratch[${last_index}]
-      [[ -n "$DEBUG" ]] && echo "searching for $template"
-      if [ -e "$template" ]; then
-        [[ -n "$DEBUG" ]] && echo "Loading $template"
-        . "$template" && return 0
-      fi
+      attempt_load $template && return 0
     done
+    attempt_load "${TEMPLATE_DIR}/${s1}.template.rc" && return 0
   done
-  if [ -e "${TEMPLATE_DIR}/default.template.rc" ]; then
-      [[ -n "$DEBUG" ]] && echo "${TEMPLATE_DIR}/default.template.rc loaded as fallback"
-    . "${TEMPLATE_DIR}/default.template.rc"
-  else
-    echo "No default template found ($protocol $NAGIOS_CONTACTADDRESS)" >> /dev/stderr
-  fi
+  attempt_load "${TEMPLATE_DIR}/default.template.rc" || \
+  echo "No default template found ($protocol $NAGIOS_CONTACTADDRESS)"
 }
 
 
@@ -149,7 +152,7 @@ function send() {
     '')
       ;;
     *)
-      echo "unsupported command: $proto"
+      echo "unsupported command: [$proto]"
       ;;
   esac
 }
