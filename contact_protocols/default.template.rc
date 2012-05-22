@@ -1,0 +1,10 @@
+# check if it's a host notification or a service notification
+if [ "$NAGIOS_HOSTEVENTID" -gt 0 ]; then
+	message="$NAGIOS_HOSTDESC is $NAGIOS_HOSTSTATE - $NAGIOS_LONGHOSTOUTPUT"
+	subject="$NAGIOS_HOSTALIAS is $NAGIOS_HOSTSTATE"
+	title="Host Alert"
+else
+	message="$NAGIOS_SERVICEDESC/ is $NAGIOS_SERVICESTATE - $NAGIOS_LONGSERVICEOUTPUT"
+	subject="[$NAGIOS_NOTIFICATIONTYPE] $NAGIOS_SERVICEDESC/$NAGIOS_HOSTNAME is $NAGIOS_SERVICESTATE"
+	title="Service Alert"
+fi
