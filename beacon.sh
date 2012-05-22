@@ -23,13 +23,33 @@
 # SOFTWARE.
 
 # debug mode set prior to execution -- this shortcircutes execution and displays lots of info
-DEBUG=${DEBUG:+'1'}
+DEBUG=${DEBUG:-'1'}
+
+# args
+while true; do
+  case "$1" in
+    --service)
+      ALERT_TYPE="service"; shift
+      ;;
+    --host)
+      ALERT_TYPE="host"; shift
+      ;;
+    *)
+      break
+      ;;
+    "")
+      break
+      ;;
+  esac
+done
 
 # contact protocol application paths
 PROWL="/usr/local/sbin/prowl.pl"
 NMA="nma.pl"
 MAILBIN="/usr/bin/mail"
 TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
+ALERT_TYPE=${ALERT_TYPE:='service'}
+
 
 # temlate searches
 # there are two scopes, outer is iterated through
