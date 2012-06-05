@@ -11,6 +11,9 @@ TEMPLATES = $(PROTOS)/*.rc
 
 install: $(TARGET)
 
+update:
+	git pull
+
 $(TARGET): $(TEMPLATES)
 	install -m 0755 $(TARGET) $(BIN_DIR)/
 
