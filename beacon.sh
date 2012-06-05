@@ -51,7 +51,7 @@ TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
 ALERT_TYPE=${ALERT_TYPE:='service'}
 
 
-# temlate searches
+# template searches
 # there are two scopes, outer is iterated through
 # inner is concatonated-shifted through
 # make sure any macro vars used here are escaped

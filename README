@@ -19,7 +19,7 @@ overridden [optional]
 url: prowl only -- urls can be embedded in the message but prowl suppots opening
 a defined url in another application [optional]
 
-Temlates are read from the template_dir (passed as the sole argument to the
+Templates are read from the template_dir (passed as the sole argument to the
 script if required) in the following order.
 
 {protocol}.{notification_type}.template.sh
