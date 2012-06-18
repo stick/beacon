@@ -14,7 +14,7 @@ install: $(TARGET)
 update:
 	git pull
 
-$(TARGET): $(TEMPLATES)
+$(TARGET):
 	install -m 0755 $(TARGET) $(BIN_DIR)/
 
 $(TEMPLATES): $(PROTO_DIR)
@@ -25,3 +25,13 @@ $(PROTO_DIR):
 
 all::
 	@echo "try make install"
+
+nagios-commands:
+	@echo "define command {"
+	@echo "\tcommand_name service-notify-by-beacon"
+	@echo "\tcommand_line /usr/local/sbin/beacon.sh --service &> /tmp/beacon.err"
+	@echo "}"
+	@echo "define command {"
+	@echo "\tcommand_name host-notify-by-beacon"
+	@echo "\tcommand_line /usr/local/sbin/beacon.sh --host &> /tmp/beacon.err"
+	@echo "}"

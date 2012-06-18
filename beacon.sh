@@ -74,19 +74,27 @@ function determine_contact() {
     local proto
     local apikey
     local notify_num
+    local notify_num_start
+    local notify_num_end
     local contactaddr
     eval ca1="NAGIOS_CONTACTADDRESS${n}"
     eval contactaddr=\$$ca1
     proto=$( echo $contactaddr | awk -F: '{ print $1 }' )
     apikey=$( echo $contactaddr | awk -F: '{ print $2 }' )
     notify_num=$( echo $contactaddr | awk -F: '{ print $3 }' )
+    notify_num_start=$( echo $notify_num | awk -F- '{ print $1 }' )
+    notify_num_end=$( echo $notify_num | awk -F- '{ print $2 }' )
     priority_override=$( echo $contactaddr | awk -F: '{ print $4 }' )
-    notify_num=${notify_num:=0}
+    notify_num_start=${notify_num_start:=0}
+    notify_num_end=${notify_num_end:=$NAGIOS_NOTIFICATIONNUMBER}
 
     if [ -n "$DEBUG" ]; then
       echo "Checking $ca1: $contactaddr"
     fi
-    if [ "$NAGIOS_NOTIFICATIONNUMBER" -gt "$notify_num" ]; then
+
+    check_start=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_start ))
+    check_end=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_end ))
+    if [ "$check_start" -ge 0 -a "$check_end" -le 0 ]; then
       send $proto $apikey
     fi
   done
