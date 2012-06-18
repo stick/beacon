@@ -179,6 +179,9 @@ function send() {
       eval $SMS
       ;;
     email)
+      if [ "$addr" == "email" ]; then
+        addr="${NAGIOS_CONTACTEMAIL}"
+      fi
       eval $MAILBIN \
         -apikey=\"${addr}\" \
         -event=\"${subject}\" \
