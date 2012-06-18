@@ -46,7 +46,7 @@ done
 # contact protocol application paths
 PROWL="/usr/local/sbin/prowl.pl"
 NMA="nma.pl"
-MAILBIN="/usr/bin/mail"
+MAILBIN="/usr/local/sbin/email.sh"
 TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
 ALERT_TYPE=${ALERT_TYPE:='service'}
 
@@ -179,7 +179,12 @@ function send() {
       eval $SMS
       ;;
     email)
-      eval $MAILBIN
+      eval $MAILBIN \
+        -apikey=\"${addr}\" \
+        -event=\"${subject}\" \
+        -notification=\"${message}\" \
+        -priority="${priority}" \
+        -application=\"${title}\"
       ;;
     '')
       ;;
