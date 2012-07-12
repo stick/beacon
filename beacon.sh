@@ -132,7 +132,7 @@ function load_template() {
     attempt_load "${TEMPLATE_DIR}/${s1}.template.rc" && return 0
   done
   attempt_load "${TEMPLATE_DIR}/default.template.rc" || \
-  echo "No default template found ($protocol $NAGIOS_CONTACTADDRESS)"
+  echo "No default template found ($protocol $NAGIOS_CONTACTEMAIL)"
 }
 
 
@@ -176,6 +176,9 @@ function send() {
         -application=\"${title}\"
       ;;
     sms)
+      if [ "$addr" == "pager" ]; then
+        addr="${NAGIOS_CONTACTPAGER}"
+      fi
       eval $SMS
       ;;
     email)
