@@ -46,7 +46,7 @@ done
 # contact protocol application paths
 PROWL="/usr/local/sbin/prowl.pl"
 NMA="nma.pl"
-MAILBIN="/usr/local/sbin/email.sh"
+MAILBIN="/usr/local/sbin/service_alert.py"
 TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
 ALERT_TYPE=${ALERT_TYPE:='service'}
 
@@ -87,13 +87,13 @@ function determine_contact() {
     priority_override=$( echo $contactaddr | awk -F: '{ print $4 }' )
     notify_num_start=${notify_num_start:=0}
     notify_num_end=${notify_num_end:=$NAGIOS_NOTIFICATIONNUMBER}
+    check_start=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_start ))
+    check_end=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_end ))
 
     if [ -n "$DEBUG" ]; then
       echo "Checking $ca1: $contactaddr"
     fi
 
-    check_start=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_start ))
-    check_end=$(( $NAGIOS_NOTIFICATIONNUMBER - $notify_num_end ))
     if [ "$check_start" -ge 0 -a "$check_end" -le 0 ]; then
       send $proto $apikey
     fi
@@ -176,13 +176,13 @@ function send() {
         -application=\"${title}\"
       ;;
     sms)
-      if [ "$addr" == "pager" ]; then
+      if [ "$addr" == "--pager--" ]; then
         addr="${NAGIOS_CONTACTPAGER}"
       fi
       eval $SMS
       ;;
     email)
-      if [ "$addr" == "email" ]; then
+      if [ "$addr" == "--email--" ]; then
         addr="${NAGIOS_CONTACTEMAIL}"
       fi
       eval $MAILBIN \

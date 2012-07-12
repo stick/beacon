@@ -48,6 +48,7 @@ define contact {
   service_notification_commands beacon, notify-by-email, notify-by-pager
   address1 prowl:{apikey}:3  # after the 3rd notification -- send via prowl to the designated api key
   address2 nma:{apikey}:4    # after the 4th notification -- send via nma to designated api key
+  address3 email:--email-- # use the email protocol handler -- uses 'email' from the contact
 }
 
 Defined Protocols
