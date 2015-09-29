@@ -62,6 +62,7 @@ Just add another option to the case statement defining another contact protocol.
 [2]
 
 prowl: http://www.prowlapp.com
+pushover: https://github.com/jedda/OSX-Monitoring-Tools/blob/master/notify_by_pushover.sh
 nma: https://nma.usk.bz/index.jsp
 email: /usr/bin/mail
 sms: stubbed but not implemented [1]

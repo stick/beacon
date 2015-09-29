@@ -45,6 +45,8 @@ done
 
 # contact protocol application paths
 PROWL="/usr/local/sbin/prowl.pl"
+PUSHOVER="/usr/local/sbin/notify_by_pushover.sh"
+PUSHOVER_APITOKEN=""
 NMA="nma.pl"
 MAILBIN="/usr/local/sbin/service_alert.py"
 TEMPLATE_DIR=${1:-'/etc/nagios/contact_protocols'} # location of templates
@@ -157,6 +159,17 @@ function send() {
 
   ## add contact protocols here ##
   case $proto in
+    pushover)
+      eval $PUSHOVER \
+        -u \"${addr}\" \
+        -a \"${PUSHOVER_APITOKEN}\" \
+        -t \"${title}\" \
+        -p \"${priority}\" \
+        -m \"${message}\" \
+        -w \"siren\" \
+        -c \"alien\" \
+        -o \"mechanical\"
+      ;;
     prowl)
       [ -n "$url" ] && url_option="-url $url"
       eval $PROWL \
